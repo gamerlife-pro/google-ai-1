@@ -31,7 +31,7 @@ app.post("/api/analyze", async (req, res) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash",
       contents: `Perform a deep market research and business idea analysis for the following idea: "${idea}". 
       Provide specific data points for market size, a list of potential competitors, a SWOT analysis, and target audience segments.
       IMPORTANT: Be consistent. If this is a repeat analysis for the same idea, ensure the numerical market data and strategic points are stable and grounded in realistic industry estimates.`,
@@ -103,7 +103,10 @@ app.post("/api/analyze", async (req, res) => {
     res.json(result);
   } catch (error: any) {
     console.error("Gemini Error:", error);
-    res.status(500).json({ error: "Failed to analyze idea. Please check your API key and try again." });
+    const errorMessage = error?.status === "UNAVAILABLE" 
+      ? "The AI model is currently experiencing high demand. Please try again in a few moments."
+      : "Failed to analyze idea. Please try again later.";
+    res.status(error?.status === "UNAVAILABLE" ? 503 : 500).json({ error: errorMessage });
   }
 });
 
