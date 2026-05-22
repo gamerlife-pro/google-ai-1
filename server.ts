@@ -103,10 +103,21 @@ app.post("/api/analyze", async (req, res) => {
     res.json(result);
   } catch (error: any) {
     console.error("Gemini Error:", error);
-    const errorMessage = error?.status === "UNAVAILABLE" 
-      ? "The AI model is currently experiencing high demand. Please try again in a few moments."
-      : "Failed to analyze idea. Please try again later.";
-    res.status(error?.status === "UNAVAILABLE" ? 503 : 500).json({ error: errorMessage });
+    let errorMessage = "Failed to analyze idea. Please try again later.";
+    let statusCode = 500;
+
+    if (error?.status === "UNAVAILABLE") {
+      errorMessage = "The AI model is currently experiencing high demand. Please try again in a few moments.";
+      statusCode = 503;
+    } else if (error?.status === "PERMISSION_DENIED" && error?.message?.includes("leaked")) {
+      errorMessage = "Your Gemini API key was reported as leaked or invalid. Please configure a new API key.";
+      statusCode = 403;
+    } else if (error?.status === "PERMISSION_DENIED") {
+      errorMessage = "Permission denied. Please check your Gemini API key.";
+      statusCode = 403;
+    }
+
+    res.status(statusCode).json({ error: errorMessage });
   }
 });
 

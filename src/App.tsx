@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { AnalyzerForm } from './components/AnalyzerForm';
 import { AnalysisDashboard } from './components/AnalysisDashboard';
-import { UserProfile } from './components/UserProfile';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 
@@ -109,8 +108,6 @@ export default function App() {
           )}
         </AnimatePresence>
       </main>
-
-      <UserProfile />
 
       {/* Footer Decoration */}
       {!data && (
